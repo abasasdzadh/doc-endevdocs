@@ -1,0 +1,62 @@
+name: Sync DevDocs
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create folders
+        run: |
+          mkdir -p markdown
+          mkdir -p python
+          mkdir -p javascript
+          mkdir -p css
+          mkdir -p html
+
+      - name: Download Markdown
+        run: |
+          curl -L https://documents.devdocs.io/markdown/db.json -o markdown/db.json
+          curl -L https://documents.devdocs.io/markdown/index.json -o markdown/index.json
+
+      - name: Download Python
+        run: |
+          curl -L https://documents.devdocs.io/python/db.json -o python/db.json
+          curl -L https://documents.devdocs.io/python/index.json -o python/index.json
+
+      - name: Download JavaScript
+        run: |
+          curl -L https://documents.devdocs.io/javascript/db.json -o javascript/db.json
+          curl -L https://documents.devdocs.io/javascript/index.json -o javascript/index.json
+
+      - name: Download CSS
+        run: |
+          curl -L https://documents.devdocs.io/css/db.json -o css/db.json
+          curl -L https://documents.devdocs.io/css/index.json -o css/index.json
+
+      - name: Download HTML
+        run: |
+          curl -L https://documents.devdocs.io/html/db.json -o html/db.json
+          curl -L https://documents.devdocs.io/html/index.json -o html/index.json
+
+      - name: Commit and Push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add .
+
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Sync DevDocs"
+            git push
+          fi
