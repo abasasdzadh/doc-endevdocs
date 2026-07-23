@@ -1,0 +1,40 @@
+name: Sync DevDocs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download docs
+        run: |
+          docs=("markdown" "python" "javascript" "css" "html")
+
+          for doc in "${docs[@]}"; do
+            mkdir -p "$doc"
+
+            curl -L "https://documents.devdocs.io/$doc/db.json" \
+              -o "$doc/db.json"
+
+            curl -L "https://documents.devdocs.io/$doc/index.json" \
+              -o "$doc/index.json"
+          done
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add .
+
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Update DevDocs"
+            git push
+          fi
