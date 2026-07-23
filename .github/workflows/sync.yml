@@ -3,6 +3,9 @@ name: Sync DevDocs
 on:
   workflow_dispatch:
 
+  schedule:
+    - cron: "0 0 * * 0"
+
 permissions:
   contents: write
 
@@ -29,8 +32,8 @@ jobs:
 
       - name: Download Python
         run: |
-          curl -L https://documents.devdocs.io/python/db.json -o python/db.json
-          curl -L https://documents.devdocs.io/python/index.json -o python/index.json
+          curl -L https://documents.devdocs.io/python~3.13/db.json -o python/db.json
+          curl -L https://documents.devdocs.io/python~3.13/index.json -o python/index.json
 
       - name: Download JavaScript
         run: |
@@ -47,7 +50,7 @@ jobs:
           curl -L https://documents.devdocs.io/html/db.json -o html/db.json
           curl -L https://documents.devdocs.io/html/index.json -o html/index.json
 
-      - name: Commit and Push
+      - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -55,8 +58,8 @@ jobs:
           git add .
 
           if git diff --cached --quiet; then
-            echo "No changes"
+            echo "No changes."
           else
-            git commit -m "Sync DevDocs"
+            git commit -m "Update DevDocs cache"
             git push
           fi
